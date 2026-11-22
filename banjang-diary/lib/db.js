@@ -1,19 +1,19 @@
 const crypto = require('crypto');
 const URL_ = process.env.SUPABASE_URL;
-const KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
+const KEY = (process.env.SUPABASE_SERVICE_ROLE_KEY || '').trim();
 
 async function sb(path, { method = 'GET', body, prefer } = {}) {
   const r = await fetch(`${URL_}/rest/v1/${path}`, {
     method,
     headers: {
-     apikey: KEY,
+    apikey: KEY,
 ...(KEY.startsWith('eyJ') ? { Authorization: `Bearer ${KEY}` } : {}),
       'Content-Type': 'application/json',
       ...(prefer ? { Prefer: prefer } : {}),
     },
     body: body ? JSON.stringify(body) : undefined,
   });
-  if (!r.ok) throw new Error(`DB ${r.status}`);
+ if (!r.ok) throw new Error(`DB ${r.status} ${(await r.text()).slice(0, 200)}`);
   const t = await r.text();
   return t ? JSON.parse(t) : null;
 }
