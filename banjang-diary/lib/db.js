@@ -6,7 +6,8 @@ async function sb(path, { method = 'GET', body, prefer } = {}) {
   const r = await fetch(`${URL_}/rest/v1/${path}`, {
     method,
     headers: {
-      apikey: KEY, Authorization: `Bearer ${KEY}`,
+     apikey: KEY,
+...(KEY.startsWith('eyJ') ? { Authorization: `Bearer ${KEY}` } : {}),
       'Content-Type': 'application/json',
       ...(prefer ? { Prefer: prefer } : {}),
     },
